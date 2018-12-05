@@ -1,0 +1,25 @@
+{
+  "name": "internet-banking",
+  "version": "1.0.0",
+  "description": "Aplicação recursos Internet Banking",
+  "main": "serve.js",
+  "scripts": {
+    "test": "\"./node_modules/.bin/mocha --reporter spec\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NatyR/Internet-Banking.git"
+  },
+  "author": "Renata Felix",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NatyR/Internet-Banking/issues"
+  },
+  "homepage": "https://github.com/NatyR/Internet-Banking#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mongoose": "^5.3.14",
+    "request": "^2.88.0"
+  }
+}
