@@ -17,8 +17,8 @@ const basicAuth = require('express-basic-auth') //chamada do pacote Basic Auth
 //========================================
 mongoose.connect('mongodb://banking:banking1212@ds127094.mlab.com:27094/internet-banking', { useNewUrlParser: true });
 
-//Chamando o modelo de Usuario
-var Usuario = require('./app/model/usuario')
+var Usuario = require('./app/model/usuario'); ////Chamando o modelo de Usuario
+var Conta = require('./app/model/conta'); //Chamando o modelo de Conta
 
 /**Configurando a variável app para utilizar o bodyParser(). 
  * Dessa forma, conseguimos retornar os dados
@@ -55,6 +55,7 @@ router.get('/', function(req, res){
 router.route('/usuarios') //acesso POST http://localhost:3000/api/usuarios
 .post(function(req, res){
     var usuario = new Usuario();
+    var conta = new Conta();
 
     //Setando dados do Usuario
     usuario.nome = req.body.nome;
@@ -63,19 +64,23 @@ router.route('/usuarios') //acesso POST http://localhost:3000/api/usuarios
     usuario.cpf_cnpj = req.body.cpf_cnpj;
     usuario.data_nascimento = req.body.data_nascimento;
     usuario.senha = req.body.senha;
-    usuario.conta =  getRandom();
+    conta.numero_conta =  getRandom();
     
     function getRandom() {
         return (Math.floor(Math.random() * 1000000000) - 1000)
     }
-     
-
 
     usuario.save(function(error){
         if(error){
             res.send(error);
         }
         res.json({ message: 'Usuario criado com sucesso'});
+    });
+
+    conta.save(function(error){
+        if(error){
+            res.send(error);
+        }        
     });
 
 })

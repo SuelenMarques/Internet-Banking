@@ -12,7 +12,9 @@ var Schema = mongoose.Schema;
         cpf_cnpj: String,
         data_nascimento: Date,
         senha: String,
-        conta: Number       
+        //conta: Number
+        //Conta: Array
+             
     });
 
 module.exports = mongoose.model('Usuario', UsuarioSchema);
