@@ -1,5 +1,5 @@
 /** Definindo os schemas para utilização na base de dados do MongoDB
- *                     MODELO DE USUÁRIO
+ *                     CLASSE USUÁRIO
 */
 
 var mongoose = require('mongoose');
@@ -11,7 +11,8 @@ var Schema = mongoose.Schema;
         telefone: Number,
         cpf_cnpj: String,
         data_nascimento: Date,
-        senha: String        
+        senha: String,
+        conta: Number       
     });
 
 module.exports = mongoose.model('Usuario', UsuarioSchema);

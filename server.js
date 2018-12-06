@@ -63,6 +63,13 @@ router.route('/usuarios') //acesso POST http://localhost:3000/api/usuarios
     usuario.cpf_cnpj = req.body.cpf_cnpj;
     usuario.data_nascimento = req.body.data_nascimento;
     usuario.senha = req.body.senha;
+    usuario.conta =  getRandom();
+    
+    function getRandom() {
+        return (Math.floor(Math.random() * 1000000000) - 1000)
+    }
+     
+
 
     usuario.save(function(error){
         if(error){
@@ -119,8 +126,12 @@ router.route('/usuarios/:usuario_id')// acesso GET:id http://localhost:8080/api/
             
             //Retornando valores atuais (realizar a alteração)
             usuario.nome = req.body.nome;
-            usuario.login = req.body.login;
+            usuario.email = req.body.email;
+            usuario.telefone = req.body.telefone;
+            usuario.cpf_cnpj = req.body.cpf_cnpj;
+            usuario.data_nascimento = req.body.data_nascimento;
             usuario.senha = req.body.senha;
+        
 
             //Salvando as alterações
             usuario.save(function(error) {
