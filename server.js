@@ -8,9 +8,9 @@ var mongoose = require('mongoose'); //chamada do pacote Mongoose
 const basicAuth = require('express-basic-auth') //chamada do pacote Basic Auth
  
 //Adicionando Autenticação para realizar requisições na API
-app.use(basicAuth({
-    users: { 'bancode': 'GNEVS' }
-}));
+// app.use(basicAuth({
+//     users: { 'bancode': 'GNEVS' }
+// }));
 
 
 //Configuração da Base de Dados da Aplicação

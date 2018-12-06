@@ -14,9 +14,4 @@ var Schema = mongoose.Schema;
         senha: String        
     });
 
-
-
-
-
-
 module.exports = mongoose.model('Usuario', UsuarioSchema);
