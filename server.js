@@ -1,11 +1,17 @@
 //Base setup da Aplicação
 
 //Chamando os pacotes para a aplicação
+
 var express = require('express'); //chamada do pacote express
 var app = express(); //atribuindo o express para a variável app
 var bodyParser = require('body-parser'); //chamada do pacote BodyParser
 var mongoose = require('mongoose'); //chamada do pacote Mongoose
 const basicAuth = require('express-basic-auth') //chamada do pacote Basic Auth
+var jwt = require('jsonwebtoken');
+
+//Carregar o arquivo de variavel de criptografia TOKEN
+require("dotenv-safe").load();
+
 
 //Adicionando Autenticação para realizar requisições na API
 // app.use(basicAuth({
@@ -48,6 +54,57 @@ router.use(function (req, res, next) {
 router.get('/', function (req, res) {
     res.json({ messagem: 'Api Configurada' });
 });
+
+
+
+/**        ROTAS LOGIN / LOGOUT
+ * ========================================
+*/
+router.route('/login')
+.post(function (req, res, next) { 
+        
+    //Validar autenticação
+    if(req.body.cpf === 'naty' && req.body.senha === '123'){        
+        
+        const id = 1; //esse id virá do banco de dados
+        var token = jwt.sign({ id }, process.env.SECRET, {
+          expiresIn: 300 // token expira em 5 minutos
+        });
+        res.status(200).send({ auth: true, token: token });
+      }
+      
+      res.status(500).send('Login inválido!');
+    })
+
+//Rota LOGOUT
+router.route('/logout')
+.get(function(req, res) {
+    res.status(200).send({ auth: false, token: null });
+ });
+
+ 
+ //Validação de Autorização JWT
+function verifyJWT(req, res, next){
+//obtendo o token a partir do cabeçalho que se não existir, gera um erro
+  var token = req.headers['x-access-token'];
+  if (!token) return res.status(401).send({ auth: false, message: 'Nenhum Token Fornecido.' });
+  
+  //caso exista um token, valida a autenticidade dele validando com o SECRET. Se não decodificar o token, gera erro
+  jwt.verify(token, process.env.SECRET, function(err, decoded) {
+    if (err) return res.status(500).send({ auth: false, message: 'Falha ao Autenticar o Token.' });
+    
+    //Se tudo estiver ok, salva no request para uso posterior
+    req.userId = decoded.id;
+    next();
+  });
+}
+
+
+
+
+
+
+    
 
 
 
@@ -103,7 +160,8 @@ router.route('/usuarios')
 
 
     //Acesso GET http://localhost:3000/api/usuarios
-    .get(function (req, res) {
+    //verifyJWT valida se o usuário possui permissão de acesso aos dados desta api
+    .get(verifyJWT,function (req, res) {
 
         //Selecionar todos os usuarios
         Usuario.find(function (err, usuarios) {
@@ -198,17 +256,15 @@ router.route('/contas')
         });
     });
 
-//Definindo prefixo 'api' para as rotas
-app.use('/api', router);
-
-//Iniciando o Servidor
-app.listen(port);
-console.log('Aplicação rodando em http://localhost:' + port);
 
 
-//Rota de acesso ao historico da conta
+/**        ROTAS HISTORICO
+* ========================================
+*/
+
 router.route('/historico')
-
+    
+    //Acesso POST  http://localhost:3000/api/historico
     //Cria o historico
     .post(function (req, res) {
         var historico = new Historico();
@@ -227,7 +283,9 @@ router.route('/historico')
             res.json({ message: 'Histórico Criado com Sucesso! ' });
         });
     })
+ 
 
+    //Acesso GET http://localhost:3000/api/historico
     //Lista todo o historico de acordo com o id de usuário
     .get(function (req, res) {
         Historico.find({ 'usuario_id': req.body.usuario_id }, function (error, historico) {
@@ -237,4 +295,12 @@ router.route('/historico')
             res.json(historico);
         });
     });
+
+
+//Definindo prefixo 'api' para as rotas
+app.use('/api', router);
+
+//Iniciando o Servidor
+app.listen(port);
+console.log('Aplicação rodando em http://localhost:' + port);
 
