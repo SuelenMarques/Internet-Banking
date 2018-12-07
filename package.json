@@ -4,7 +4,8 @@
   "description": "Aplicação recursos Internet Banking",
   "main": "serve.js",
   "scripts": {
-    "test": "\"./node_modules/.bin/mocha --reporter spec\""
+    "test": "\"./node_modules/.bin/mocha --reporter spec\"",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
