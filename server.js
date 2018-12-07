@@ -36,7 +36,7 @@ var port = process.env.PORT || 3000;
 //Capturando as instancias das rotas do Express
 var router = express.Router();
 
-//TESTE - Mensagem Padrão para enviar nos requests da Api (Middleware)
+//Mensagem Padrão para enviar nos requests da Api (Middleware)
 router.use(function(req, res, next){
     console.log('Uma requisição ocorreu ...');
     next(); //prosseguindo para a próxima rota da aplicação
@@ -49,33 +49,47 @@ router.get('/', function(req, res){
 });
 
 
-/** Verbo POST de USUÁRIO (Criar novo Usuário)
+
+
+/**        ROTAS USUARIO
  * ========================================
 */
-router.route('/usuarios') //acesso POST http://localhost:3000/api/usuarios
+
+
+//Acesso POST http://localhost:3000/api/usuarios
+router.route('/usuarios') 
 .post(function(req, res){
     var usuario = new Usuario();
     var conta = new Conta();
-
-    //Setando dados do Usuario
+    
+    //Setando dados do Usuario / Conta
     usuario.nome = req.body.nome;
     usuario.email = req.body.email;
     usuario.telefone = req.body.telefone;
-    usuario.cpf_cnpj = req.body.cpf_cnpj;
+    usuario.cpf = req.body.cpf;
     usuario.data_nascimento = req.body.data_nascimento;
     usuario.senha = req.body.senha;
+    usuario.estado = req.body.estado;
+    usuario.cidade = req.body.cidade;
+    usuario.endereco = req.body.endereco;
+    usuario.numero = req.body.numero;
+    usuario.bairro = req.body.bairro;
+    usuario.complemento = req.body.complemento;
+    usuario.cep = req.body.cep;
+    conta._id_user = usuario._id;
     conta.numero_conta =  getRandom();
+    conta.saldo = 0;
     
     function getRandom() {
         return (Math.floor(Math.random() * 1000000000) - 1000)
     }
-
+    
     usuario.save(function(error){
         if(error){
             res.send(error);
         }
         res.json({ message: 'Usuario criado com sucesso'});
-    });
+    }); 
 
     conta.save(function(error){
         if(error){
@@ -85,11 +99,8 @@ router.route('/usuarios') //acesso POST http://localhost:3000/api/usuarios
 
 })
 
-/** Verbo GET de USUÁRIO (Listar todos os Usuários)
- * ========================================
-*/
- //Acesso GET http://localhost:3000/api/usuarios
 
+//Acesso GET http://localhost:3000/api/usuarios
 .get(function(req, res){
     
     //Selecionar todos os usuarios
@@ -102,10 +113,8 @@ router.route('/usuarios') //acesso POST http://localhost:3000/api/usuarios
 });
 
 
-/** Verbo GET:ID de USUÁRIO (Listar Usuario por Id)
- * ========================================
-*/
-router.route('/usuarios/:usuario_id')// acesso GET:id http://localhost:8080/api/usuarios/:usuario_id) 
+// Acesso GET:id http://localhost:8080/api/usuarios/:usuario_id) 
+router.route('/usuarios/:usuario_id')
     
     .get(function(req, res) {
  
@@ -118,11 +127,9 @@ router.route('/usuarios/:usuario_id')// acesso GET:id http://localhost:8080/api/
         });
     })
 
-    /** Verbo GET:ID de USUÁRIO (Listar Usuario por Id)
-    * ========================================
-    */
-    //Acessar em: PUT http://localhost:8080/api/usuarios/:usuario_id) 
-    .put(function(req, res) {
+   
+//Acessar em: PUT http://localhost:8080/api/usuarios/:usuario_id) 
+.put(function(req, res) {
 
         //Localizar o usuario via ID
         Usuario.findById(req.params.usuario_id, function(error, usuario) {
@@ -133,10 +140,16 @@ router.route('/usuarios/:usuario_id')// acesso GET:id http://localhost:8080/api/
             usuario.nome = req.body.nome;
             usuario.email = req.body.email;
             usuario.telefone = req.body.telefone;
-            usuario.cpf_cnpj = req.body.cpf_cnpj;
+            usuario.cpf = req.body.cpf;
             usuario.data_nascimento = req.body.data_nascimento;
             usuario.senha = req.body.senha;
-        
+            usuario.estado = req.body.estado;
+            usuario.cidade = req.body.cidade;
+            usuario.endereco = req.body.endereco;
+            usuario.numero = req.body.numero;
+            usuario.bairro = req.body.bairro;
+            usuario.complemento = req.body.complemento;
+            usuario.cep = req.body.cep;                    
 
             //Salvando as alterações
             usuario.save(function(error) {
@@ -148,11 +161,9 @@ router.route('/usuarios/:usuario_id')// acesso GET:id http://localhost:8080/api/
         });
     })
 
-    /** Verbo DELETE:ID de USUÁRIO (Excluir Usuario por Id)
-    * ========================================
-    */
-   //Acessar em: http://localhost:8080/api/usuarios/:usuario_id) */
-    .delete(function(req, res) {
+   
+//Acessar em: http://localhost:8080/api/usuarios/:usuario_id) */
+.delete(function(req, res) {
 
         //Excluindo dados e verificando possiveis erros durante o processo
         Usuario.remove({
@@ -164,6 +175,32 @@ router.route('/usuarios/:usuario_id')// acesso GET:id http://localhost:8080/api/
             res.json({ message: 'Usuário removido com Sucesso! '});
         });
     });
+
+
+
+
+
+/**        ROTAS CONTA
+* ========================================
+*/
+router.route('/contas')
+
+//Acesso GET http://localhost:3000/api/usuarios
+.get(function(req, res){
+    
+    //Selecionar todos os usuarios
+    Conta.find(function(err, contas){
+        if(err)
+            res.send(err);
+
+            res.json(contas);        
+    });
+});
+
+
+
+
+
 
 
 //Definindo prefixo 'api' para as rotas

@@ -1,16 +1,16 @@
 /** Definindo os schemas para utilização na base de dados do MongoDB
- *                     CLASSE CONTA
+ *                      CONTA
 */
 
-var mongoose = require('mongoose');
-
-
+var mongoose = require('mongoose'); ////chamada do pacote Mongoose
 
 var Schema = mongoose.Schema;
    
-    var ContaSchema = new Schema({
+    var ContaSchema = new Schema({         
+       _id_user: String,     
         numero_conta: Number,
-          
+        saldo: Number,
+        Extrato: Array      
              
     });
 
