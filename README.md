@@ -10,8 +10,15 @@ Renata Felix | Gabriela Vieira | Eduardo Vinicius | Eldrin Cordova | Suelen Marq
 # Testes
 API testada com o software POSTMAN
 
+
 # Configuração do Ambiente para execução do Sistema:
-(Pendente)
+Execução do servidor (API): node server
+
+Dados Banco:
+MLAB - https://mlab.com/login/
+Usuario - banking
+Senha: - banking1212
+
 
 
 
