@@ -9,8 +9,7 @@ var Schema = mongoose.Schema;
     var ContaSchema = new Schema({         
        _id_user: String,     
         numero_conta: Number,
-        saldo: Number,
-        Extrato: Array      
+        saldo: Number             
              
     });
 

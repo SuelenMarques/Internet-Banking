@@ -6,17 +6,10 @@ var express = require('express'); //chamada do pacote express
 var app = express(); //atribuindo o express para a variável app
 var bodyParser = require('body-parser'); //chamada do pacote BodyParser
 var mongoose = require('mongoose'); //chamada do pacote Mongoose
-const basicAuth = require('express-basic-auth') //chamada do pacote Basic Auth
 var jwt = require('jsonwebtoken');
 
 //Carregar o arquivo de variavel de criptografia TOKEN
 require("dotenv-safe").load();
-
-
-//Adicionando Autenticação para realizar requisições na API
-// app.use(basicAuth({
-//     users: { 'bancode': 'GNEVS' }
-// }));
 
 
 //Configuração da Base de Dados da Aplicação
@@ -61,50 +54,45 @@ router.get('/', function (req, res) {
  * ========================================
 */
 router.route('/login')
-.post(function (req, res, next) { 
-        
-    //Validar autenticação
-    if(req.body.cpf === 'naty' && req.body.senha === '123'){        
-        
-        const id = 1; //esse id virá do banco de dados
-        var token = jwt.sign({ id }, process.env.SECRET, {
-          expiresIn: 300 // token expira em 5 minutos
-        });
-        res.status(200).send({ auth: true, token: token });
-      }
-      
-      res.status(500).send('Login inválido!');
-    })
+    .post(function (req, res, next) {
 
-//Rota LOGOUT
-router.route('/logout')
-.get(function(req, res) {
-    res.status(200).send({ auth: false, token: null });
- });
+        //Validar autenticação 
+        Usuario.find({ 'cpf': req.body.cpf }, function (error, usuario) {
+            if (usuario[0].senha === req.body.senha) {
+                var id = usuario[0]._id;
+                var token = jwt.sign({ id }, process.env.SECRET, {
+                    expiresIn: 300 // token expira em 5 minutos
+                });
+                res.status(200).send({ auth: true, token: token });
+            }
+            res.status(500).json({ message: 'Senha inválida' });
+        })        
 
- 
- //Validação de Autorização JWT
-function verifyJWT(req, res, next){
-//obtendo o token a partir do cabeçalho que se não existir, gera um erro
-  var token = req.headers['x-access-token'];
-  if (!token) return res.status(401).send({ auth: false, message: 'Nenhum Token Fornecido.' });
-  
-  //caso exista um token, valida a autenticidade dele validando com o SECRET. Se não decodificar o token, gera erro
-  jwt.verify(token, process.env.SECRET, function(err, decoded) {
-    if (err) return res.status(500).send({ auth: false, message: 'Falha ao Autenticar o Token.' });
-    
-    //Se tudo estiver ok, salva no request para uso posterior
-    req.userId = decoded.id;
-    next();
-  });
+    });
+
+
+//Validação de Autorização JWT TOKEN
+function verifyJWT(req, res, next) {
+    //obtendo o token a partir do cabeçalho que se não existir, gera um erro
+    var token = req.headers['x-access-token'];
+    if (!token) return res.status(401).send({ auth: false, message: 'Nenhum Token Fornecido.' });
+
+    //caso exista um token, valida a autenticidade dele validando com o SECRET. Se não decodificar o token, gera erro
+    jwt.verify(token, process.env.SECRET, function (err, decoded) {
+        if (err) return res.status(500).send({ auth: false, message: 'Falha ao Autenticar o Token.' });
+
+        //Se tudo estiver ok, salva no request para uso posterior
+        req.userId = decoded.id;
+        next();
+    });
 }
 
 
-
-
-
-
-    
+//Rota LOGOUT
+router.route('/logout')
+    .get(function (req, res) {
+        res.status(200).send({ auth: false, token: null });
+    });
 
 
 
@@ -119,7 +107,6 @@ router.route('/usuarios')
     .post(function (req, res) {
         var usuario = new Usuario();
         var conta = new Conta();
-
 
         //Setando dados do Usuario / Conta
         usuario.nome = req.body.nome;
@@ -137,7 +124,7 @@ router.route('/usuarios')
         usuario.cep = req.body.cep;
         conta._id_user = usuario._id;
         conta.numero_conta = getRandom();
-        conta.saldo = 0;
+        conta.saldo = 1000;
 
         function getRandom() {
             return (Math.floor(Math.random() * 1000000000) - 1000)
@@ -161,7 +148,8 @@ router.route('/usuarios')
 
     //Acesso GET http://localhost:3000/api/usuarios
     //verifyJWT valida se o usuário possui permissão de acesso aos dados desta api
-    .get(verifyJWT,function (req, res) {
+    //.get(verifyJWT,function (req, res) {
+    .get(verifyJWT, function (req, res) {
 
         //Selecionar todos os usuarios
         Usuario.find(function (err, usuarios) {
@@ -222,20 +210,18 @@ router.route('/usuarios/:usuario_id')
     })
 
 
-    //Acessar em: http://localhost:8080/api/usuarios/:usuario_id) */
-    .delete(function (req, res) {
+// //Acessar em: http://localhost:8080/api/usuarios/:usuario_id) */
+// .delete(function (req, res) {
+//     //Excluindo dados e verificando possiveis erros durante o processo
+//     Usuario.remove({
+//         _id: req.params.usuario_id
+//     }, function (error) {
+//         if (error)
+//             res.send(error);                         
 
-        //Excluindo dados e verificando possiveis erros durante o processo
-        Usuario.remove({
-            _id: req.params.usuario_id
-        }, function (error) {
-            if (error)
-                res.send(error);
-
-            res.json({ message: 'Usuário removido com Sucesso! ' });
-        });
-    });
-
+//         res.json({ message: 'Usuário e Conta removidos da base! ' });
+//     });
+// });
 
 
 
@@ -263,7 +249,7 @@ router.route('/contas')
 */
 
 router.route('/historico')
-    
+
     //Acesso POST  http://localhost:3000/api/historico
     //Cria o historico
     .post(function (req, res) {
@@ -283,7 +269,7 @@ router.route('/historico')
             res.json({ message: 'Histórico Criado com Sucesso! ' });
         });
     })
- 
+
 
     //Acesso GET http://localhost:3000/api/historico
     //Lista todo o historico de acordo com o id de usuário
